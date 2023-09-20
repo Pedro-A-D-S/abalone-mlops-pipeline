@@ -3,13 +3,25 @@ import sys
 import boto3
 import numpy as np
 import pandas as pd
-import sklearn
 from awsglue.utils import getResolvedOptions
 from io import StringIO
+from typing import List, Tuple, Union
 
 # Helper function to split dataset (80/19/1)
-def split_data(df, train_percent=0.8, validate_percent=0.19, seed=None):
-    np.random.seed()
+def split_data(df: pd.DataFrame, train_percent: float = 0.8, validate_percent: float = 0.19, seed: Union[int, None] = None) -> List[Tuple[str, pd.DataFrame]]:
+    """
+    Split a DataFrame into training, validation, and test sets.
+
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        train_percent (float): Percentage of data for training.
+        validate_percent (float): Percentage of data for validation.
+        seed (int or None): Seed for random number generation.
+
+    Returns:
+        List[Tuple[str, pd.DataFrame]]: List of tuples containing split data and their labels.
+    """
+    np.random.seed(seed)
     perm = np.random.permutation(df.index)
     m = len(df.index)
     train_end = int(train_percent * m)
@@ -22,7 +34,7 @@ def split_data(df, train_percent=0.8, validate_percent=0.19, seed=None):
 # Get job args
 args = getResolvedOptions(sys.argv, ['S3_INPUT_BUCKET', 'S3_INPUT_KEY_PREFIX', 'S3_OUTPUT_BUCKET', 'S3_OUTPUT_KEY_PREFIX'])
 
-# Downloading the data from S3 into a Dataframe
+# Downloading the data from S3 into a DataFrame
 column_names = ["sex", "length", "diameter", "height", "whole weight",  
                 "shucked weight", "viscera weight", "shell weight", "rings"]
 client = boto3.client('s3')
@@ -42,7 +54,7 @@ data = data[["rings", "sex", "length", "diameter", "height", "whole weight",
 print("Encoding Features ...\n")
 data = pd.get_dummies(data)
 
-# Create train, test and validate datasets
+# Create train, test, and validate datasets
 print("Creating dataset splits ...\n")
 datasets = split_data(data)
 
