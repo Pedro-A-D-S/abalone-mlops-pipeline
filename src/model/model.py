@@ -6,29 +6,31 @@ import traceback
 import tensorflow as tf
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from sklearn import preprocessing
+from typing import List, Dict, Union
 
+# Set TensorFlow logger level to ERROR to reduce verbosity
 tf.get_logger().setLevel('ERROR')
 
 # Declare communication channel between Sagemaker and container
 prefix = '/opt/ml'
-# Sagemaker stores the dataset copied from S3
-input_path = os.path.join(prefix, 'input/data')
-# If something bad happens, write a failure file with the error messages and store here
-output_path = os.path.join(prefix, 'output')
-# Everything stored here will be packed into a .tar.gz by Sagemaker and copied into S3
-model_path = os.path.join(prefix, 'model')
-# These are the hyperparameters sent to the training algorithms through the Estimator
-param_path = os.path.join(prefix, 'input/config/hyperparameters.json')
-
+input_path = os.path.join(prefix, 'input/data')  # Path to input data
+output_path = os.path.join(prefix, 'output')  # Path to store output
+model_path = os.path.join(prefix, 'model')  # Path to store trained model
+param_path = os.path.join(prefix, 'input/config/hyperparameters.json')  # Path to hyperparameters
 
 # Define function called for training
-def train():
+def train() -> None:
+    """
+    Train a TensorFlow-based regression model using the provided hyperparameters.
+
+    Raises:
+        ValueError: If training data is missing or incorrectly configured.
+    """
     print("Training mode ...")
     
     try:
@@ -38,11 +40,11 @@ def train():
         training_path = os.path.join(input_path, channel_name)
 
         params = {}
-        # Read in any hyperparameters that the are passed with the training job
+        # Read in any hyperparameters that are passed with the training job
         with open(param_path, 'r') as tc:
             is_float = re.compile(r'^\d+(?:\.\d+)$')
             is_integer = re.compile(r'^\d+$')
-            for key,value in json.load(tc).items():
+            for key, value in json.load(tc).items():
                 # Workaround to convert numbers from string
                 if is_float.match(value) is not None:
                     value = float(value)
@@ -50,8 +52,8 @@ def train():
                     value = int(value)
                 params[key] = value
 
-        # Confirm that training files exists and the channel was correctly configured
-        input_files = [ os.path.join(training_path, file) for file in os.listdir(training_path) ]
+        # Confirm that training files exist and the channel was correctly configured
+        input_files = [os.path.join(training_path, file) for file in os.listdir(training_path)]
         if len(input_files) == 0:
             raise ValueError(('There are no files in {}.\\n' +
                               'This usually indicates that the channel ({}) was incorrectly specified,\\n' +
@@ -136,10 +138,20 @@ def train():
         sys.exit(255)
 
 # Define function called for local testing
-def predict(payload, algorithm):
+def predict(payload: List[float], algorithm: keras.Model) -> List[float]:
+    """
+    Perform local testing using the trained model.
+
+    Args:
+        payload (List[float]): Input data for prediction.
+        algorithm (keras.Model): Trained TensorFlow model.
+
+    Returns:
+        List[float]: Model predictions.
+    """
     print("Local Testing Mode ...")
     if algorithm is None:
         raise ValueError("Please provide the algorithm specification")
-    payload = np.asarray(payload) # Convert the payload to numpy array
+    payload = np.asarray(payload) # Convert the payload to a numpy array
     payload = payload.reshape(1, -1) # Vectorize the payload
     return algorithm.predict(payload).tolist()
