@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Logging in ECR repo
+cd ~/environment/mlops &&\
+aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin 763104351884.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com &&\
+docker build --build-arg REGION=$AWS_DEFAULT_REGION -f Dockerfile -t tf_model:1.0 .
+
+# Building image using Dockerfile
+cd ~/environment/tests/unit_test/ && \
+mkdir -p model && \
+mkdir -p output && \
+docker run --rm --name 'my_model' \
+    -v "$PWD/model:/opt/ml/model" \
+    -v "$PWD/output:/opt/ml/output" \
+    -v "$PWD/input:/opt/ml/input" tf_model:1.0 train
+
+# Test of prediction
+docker run --rm --name 'my_model' \
+-v "$PWD/model:/opt/ml/model" \
+-v "$PWD/output:/opt/ml/output" \
+-v "$PWD/input:/opt/ml/input" tf_model:1.0 test \
+"[[4.400000000000000022e-01,3.449999999999999734e-01,1.000000000000000056e-01,3.659999999999999920e-01,1.219999999999999973e-01,9.049999999999999711e-02,1.199999999999999956e-01,0.000000000000000000e+00,1.000000000000000000e+00,0.000000000000000000e+00]]"
+
+# Serve model
+docker run --rm --name 'my_model' \
+    -p 8080:8080 \
+    -v "$PWD/model:/opt/ml/model" \
+    -v "$PWD/output:/opt/ml/output" \
+    -v "$PWD/input:/opt/ml/input" tf_model:1.0 serve
+
+# Testing API
+cd ~/environment/tests/unit_test/ &&\
+python app_test.py
+
