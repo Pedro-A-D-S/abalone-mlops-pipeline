@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import json
 import io
 import sys
@@ -19,11 +17,12 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.optimizers import Adam
 from sklearn import preprocessing
+from typing import List
 
 # Adds the model.py path to the list
 prefix = '/opt/ml'
 model_path = os.path.join(prefix, 'model')
-sys.path.insert(0,model_path)
+sys.path.insert(0, model_path)
 model_cache = {}
 
 class PredictionService(object):
@@ -39,7 +38,13 @@ class PredictionService(object):
         tf_model = cls.get_model()
         return tf_model.predict(input)
 
-def load_model():
+def load_model() -> keras.Model:
+    """
+    Load and compile the Keras model from the specified path.
+
+    Returns:
+        keras.Model: Loaded and compiled Keras model.
+    """
     # Load 'h5' keras model
     model = tf.keras.models.load_model(os.path.join(model_path, 'model.h5'))
     model.compile(optimizer='adam', loss='mse')
