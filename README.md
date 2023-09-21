@@ -212,7 +212,7 @@ This section provides an overview of the project's directory structure, highligh
 ### Installation
 1. Clone this repository:
 ```
-git clone https://github.com/Pedro-A-D-S/mlops-aws-pipeline.git
+git clone https://github.com/Pedro-A-D-S/abalone-mlops-pipeline.git
 
 cd mlops-aws-pipeline
 ```
