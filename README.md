@@ -53,6 +53,162 @@ To get started with this project, follow these steps:
 - [Install Terraform](https://www.terraform.io/downloads.html)
 - Set up a free-tier AWS account: [AWS Free Tier](https://aws.amazon.com/free/)
 
+## Project structure
+
+This section provides an overview of the project's directory structure, highlighting key folders and their associated artifacts.
+
+### `data`
+
+- **Description:** This directory contains data-related assets, including images and raw datasets.
+- **Contents:**
+  - `images`: A subdirectory housing various images used in documentation and visualization.
+  - `raw`: A subdirectory containing raw data files used for training and processing.
+
+### `docs`
+
+- **Description:** The `docs` folder is reserved for documentation files, which may include project guides, manuals, or reference materials. Currently, this project does not include specific documentation files.
+
+### `infrastructure`
+
+- **Description:** The `infrastructure` directory holds Terraform configurations for provisioning cloud resources, such as AWS services.
+- **Contents:**
+  - `terraform`: Subdirectory containing Terraform configuration files for different AWS services.
+    - `cloud9`: Configuration for AWS Cloud9, an integrated development environment (IDE).
+    - `code-commit`: Configuration for AWS CodeCommit, a version control service.
+    - `code-pipeline`: Configuration for AWS CodePipeline, a CI/CD service.
+    - `ecr`: Configuration for Amazon Elastic Container Registry (ECR), used for container image management.
+    - `iam`: Configuration for AWS Identity and Access Management (IAM) roles and policies.
+    - `s3`: Configuration for Amazon S3 buckets.
+
+### `src`
+
+- **Description:** The `src` directory contains the source code and scripts for various project components.
+- **Contents:**
+  - `cli`: Scripts and utilities for command-line interactions and setup.
+  - `etl`: Extract, Transform, Load (ETL) job configurations and scripts.
+  - `model`: Source code and resources for machine learning models.
+  - `pipeline`: Configuration and scripts for defining the project's CI/CD pipeline.
+  - `tests`: Unit and system test scripts.
+  - `utils`: Utility scripts for tasks such as resizing Cloud9 instances and repository validation.
+
+
+```
+├── data
+│   ├── images
+│   │   ├── architecture.png
+│   │   ├── pipeline-execution.png
+│   │   ├── system-train-assets.png
+│   │   └── training-assets.png
+│   └── raw
+│       └── abalone.csv
+├── docs
+├── infrastructure
+│   └── terraform
+│       ├── cloud9
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── code-commit
+│       │   ├── main.tf
+│       │   └── outputs.tf
+│       ├── code-pipeline
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── ecr
+│       │   ├── main.tf
+│       │   └── outputs.tf
+│       ├── iam
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── s3
+│           ├── main.tf
+│           ├── outputs.tf
+│           └── variables.tf
+├── LICENSE
+├── README.md
+└── src
+    ├── cli
+    │   ├── assets
+    │   │   ├── config-push-assets.sh
+    │   │   └── config-push-training-assets.sh
+    │   ├── cloud9
+    │   │   ├── resize-c9.sh
+    │   │   ├── setup-cli-cloud9.sh
+    │   │   ├── setup-cloud9.sh
+    │   │   └── variables.sh
+    │   ├── code-commit
+    │   │   └── clone-repo.sh
+    │   ├── ecr
+    │   ├── pipeline
+    │   │   └── create-pipeline.sh
+    │   ├── s3
+    │   │   └── create-s3-bucket.sh
+    │   ├── test-assets
+    │   │   └── test.sh
+    │   ├── unit-tests
+    │   │   └── perform-tests
+    │   └── validation.sh
+    ├── etl
+    │   ├── etljob.json
+    │   └── preprocess.py
+    ├── model
+    │   ├── app.py
+    │   ├── assets
+    │   │   ├── Dev
+    │   │   │   ├── deploy-model-Dev.yml
+    │   │   │   └── Dev-config.json
+    │   │   └── Prd
+    │   │       ├── deploy-model-Prd.yml
+    │   │       └── Prd-config.json
+    │   ├── build.py
+    │   ├── buildspec.yml
+    │   ├── Dockerfile
+    │   ├── model.py
+    │   ├── nginx.conf
+    │   ├── trainingjob.json
+    │   └── wsgi.py
+    ├── pipeline
+    │   ├── EtlJobMonitor
+    │   │   └── lambda.py
+    │   ├── EtlLaunchJob
+    │   │   └── lambda.py
+    │   ├── mlops-pipeline.yml
+    │   ├── ModelGroup
+    │   │   └── lambda.py
+    │   ├── TrainingJobMonitor
+    │   │   └── lambda.py
+    │   └── TrainingLaunchJob
+    │       └── lambda.py
+    ├── tests
+    │   ├── system_test
+    │   │   ├── assets
+    │   │   │   ├── evaluateEndpoint
+    │   │   │   │   └── lambda.py
+    │   │   │   ├── registerModel
+    │   │   │   │   └── lambda.py
+    │   │   │   ├── requirements.txt
+    │   │   │   └── workflow-resources.yml
+    │   │   ├── build.py
+    │   │   └── buildspec.yml
+    │   └── unit_test
+    │       ├── app_test.py
+    │       └── input
+    │           ├── config
+    │           │   └── hyperparameters.json
+    │           └── data
+    │               └── training
+    │                   ├── train.csv
+    │                   └── validate.csv
+    └── utils
+        ├── c9_resize.sh
+        ├── load_sim.py
+        └── repository_validation.py
+```
+
 ### Installation
 1. Clone this repository:
 ```
